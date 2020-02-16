@@ -3,8 +3,8 @@ package com.mycompany.a1;
 abstract public class Movable extends GameObject{
 	private int heading ;
 	private int speed;
-	private double movX;
-	private double movY;
+	private float movX;
+	private float movY;
 	
 	public void move() {
 		this.setMovX();
@@ -15,7 +15,7 @@ abstract public class Movable extends GameObject{
 	{
 		this.movX=Math.round((Math.cos(-(this.heading-90))*this.speed));
 	}
-	private double getMovX()
+	private float getMovX()
 	{
 		return this.movX;
 	}
@@ -23,7 +23,7 @@ abstract public class Movable extends GameObject{
 	{
 		this.movY=Math.round((Math.sin(-(this.heading-90))*this.speed));
 	}
-	private double getMovY()
+	private float getMovY()
 	{
 		return this.movY;
 	}

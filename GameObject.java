@@ -28,15 +28,15 @@ abstract public class GameObject extends GameWorld{
 	{	
 		return location;
 	}
-	public double getX()
+	public float getX()
 	{
 		return this.getLocation().getX();
 	}
-	public double getY()
+	public float getY()
 	{
 		return this.getLocation().getY();
 	}
-	public void setLocation(double x,double y) 
+	public void setLocation(float x,float y) 
 	{
 		this.location.setX(x);
 		this.location.setY(y);

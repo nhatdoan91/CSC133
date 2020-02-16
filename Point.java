@@ -1,30 +1,30 @@
 package com.mycompany.a1;
 
 public class Point {
-	private double x, y ;
+	private float x, y ;
 	public Point(){
-		x = 0.0 ;
-		y = 0.0 ;
+		x = (float) 0.0 ;
+		y = (float)0.0 ;
 	}
-	public double getX() 
+	public float getX() 
 	{
 		return x ;
 	}
-	public double getY() 
+	public float getY() 
 	{
 		return y ;
 	}
-	public void setLocationXY(double x, double y)
+	public void setLocationXY(float x, float y)
 	{
 		this.x=x;
 		this.y=y;
 	}
 	
-	public void setX(double newX ) 
+	public void setX(float newX ) 
 	{
 		this.x = newX;
 	}
-	public void setY(double newY )
+	public void setY(float newY )
 	{
 		this.y = newY;
 	}
