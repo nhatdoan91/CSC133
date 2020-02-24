@@ -15,7 +15,7 @@ public class Cyborg extends Movable implements ISteerable {
 		this.steeringDirection=0;
 		super.setHeading(0);
 		super.setSpeed(0);
-		this.maximumSpeed=15;
+		this.maximumSpeed=40;
 		this.energyComsumptionRate=5;
 		this.damageLevel=0;
 		this.energyLevel=100;
@@ -25,20 +25,7 @@ public class Cyborg extends Movable implements ISteerable {
 		super.setRandomLocation();
 
 	}
-	public void resetCyborg(Point location)
-	{
-		this.steeringDirection=0;
-		super.setHeading(0);
-		super.setSpeed(0);
-		this.maximumSpeed=15;
-		this.energyComsumptionRate=5;
-		this.damageLevel=0;
-		this.energyLevel=100;
-		this.lastBaseReached=1;
-		super.setColor(ColorUtil.BLUE);
-		super.setSize(15);
-		super.setLocation(location);
-	}
+
 	public void energyLostAfterTick()
 	{
 		this.energyLevel=this.energyLevel-this.energyComsumptionRate;
@@ -46,30 +33,26 @@ public class Cyborg extends Movable implements ISteerable {
 	public void changeHeading(char input) {
 		switch(input) {
 		case 'l':
-			//super.setHeading(super.getHeading()-5);
 			if(this.steeringDirection>-40)
 			{
 				this.steeringDirection=this.steeringDirection-5;
-				System.out.println("\nYou steering direction is "+ this.getSteeringDirection()+" \n");
+				System.out.println("You steering direction is "+ this.getSteeringDirection());
 			}
 			else
 			{
-				System.out.println("\nYou cant steer left anymore!!!!");
+				System.out.println("You cant steer left anymore!!!!");
 			}
 			break;
 		case 'r':
 			if(this.steeringDirection<40)
 			{
 				this.steeringDirection=this.steeringDirection+5;
-				System.out.println("\nYou steering direction is "+ this.getSteeringDirection()+" \n");
+				System.out.println("You steering direction is "+ this.getSteeringDirection());
 			}
 			else
 			{
-				System.out.println("\nYou cant steer right anymore!!!!");
+				System.out.println("You cant steer right anymore!!!!");
 			}
-			break;
-		default:
-			System.out.println("invalid input!!!!!!");
 			break;
 		}
 		
@@ -107,80 +90,69 @@ public class Cyborg extends Movable implements ISteerable {
 	}
 	public void speedUp()
 	{
-		super.setSpeed(super.getSpeed()+1);
+		super.setSpeed(super.getSpeed()+5);
 		if(this.isMaxSpeed())
 		{
 			super.setSpeed(maximumSpeed);
-			System.out.println("\nYou reached to the max speed!!!\n");
+			System.out.println("You reached to the max speed!!!");
 		}
 	}
 	public void slowDown()
 	{
-		super.setSpeed(super.getSpeed()-1);
+		super.setSpeed(super.getSpeed()-5);
 		if(super.getSpeed()<=0)
 		{
 			super.setSpeed(0);
-			System.out.println("\nYou stopped!!!\n");
+			System.out.println("You stopped!!!");
 		}
 	}
 	public boolean isBroken() {
-		return this.damageLevel+3>=10;
+		return (this.getDamageLevel() >=10);
 	}
 	public boolean isOutOfBattery() {
-		return (this.getEnergyLevel()==0);
+		return (this.getEnergyLevel()<=0);
 	}
-	 public void reduceSpeedWithDamage() {
+	public void reduceSpeedWithDamage() {
 		 super.setSpeed((super.getSpeed()*this.damageLevel)/10);
 	 }
-	 public void collideWithCyborg()
+	public void collideWithCyborg()
 	 {
-		 if((this.damageLevel +5)<=10)
-		 {
 			 this.setDamageLevel(this.getDamageLevel()+5);
 			 super.setColor(ColorUtil.rgb(0, 0, (this.damageLevel*250)/10));
-		 }else
-		 {
-			 System.out.println("\nCyborg is too damaged!!!");
-		 }
-	
 	 }
-	 public void collideWithDrone()
+	public void collideWithDrone()
 	 {
-		 if((this.damageLevel+3)<=10)
-		 {
 			 this.setDamageLevel(this.getDamageLevel()+3);
-			 super.setColor(ColorUtil.rgb(0, 0, (this.damageLevel*250)/10));
-		 }else
-		 {
-			 System.out.println("\nCyborg is too damaged!!!");
-		 }
-		 
+			 super.setColor(ColorUtil.rgb(0, 0, (this.damageLevel*250)/10));	 
 	 }
-	 public void baseReach(int baseNumber) {
+	public void baseReach(int baseNumber) {
 		 if(baseNumber==(this.lastBaseReached+1))
 		 {
 			 this.lastBaseReached=baseNumber;
 			 System.out.println("Congrats!! You reach base "+this.getLastBaseReached());
 		 }else if(baseNumber <= this.lastBaseReached)
 		 {
-			 System.out.println("\nYou have reached this base!!!\n");
-			 System.out.println("\nYou need to reach base "+ (this.lastBaseReached+1));
+			 System.out.println("\nYou have reached this base!!!");
+			 System.out.println("You need to reach base "+ (this.lastBaseReached+1));
 		 }else
 		 {
 			 System.out.println("\nYou passed base "+ (this.lastBaseReached+1));
-			 System.out.println("\nYou need to reach base "+ (this.lastBaseReached+1) + " first");
+			 System.out.println("You need to reach base "+ (this.lastBaseReached+1) + " first");
 		 }
 	 }
-	 public int getLastBaseReached() {
+	public int getLastBaseReached() {
 		 return this.lastBaseReached;
 	 }
-	 public void reachEnergyStation(int energy) {
+	public int reachEnergyStation(int energy) {
 		 this.energyLevel=this.energyLevel+energy;
-		 if(this.getEnergyLevel()>100) {
-			 this.energyLevel=100; //MAX
+		 if(this.getEnergyLevel()>=100) {
+			 int a=this.getEnergyLevel()-100;
+			 this.setEnergyLevel(100);
+			 return a;//MAX
 		 }
+		 return 0;
 	 }
-	 public boolean isAtLastBase()
+	public boolean isAtLastBase()
 	 {
 		 if(super.getLastBase()==this.lastBaseReached)
 		 {
@@ -189,9 +161,24 @@ public class Cyborg extends Movable implements ISteerable {
 		 return false;
 	 }
 
+	public int getSpeedWhileDamage() {
+		if(this.getDamageLevel()==0)
+		{
+			return super.getSpeed();
+		}
+		else
+			{
+			int newspeed= ((100-(this.getDamageLevel()*10))*super.getSpeed())/100;
+			return newspeed;
+			}
+		// 10 is maximum damage
+	}
 	 @Override
-	 public void setSize(int size) 
+	public void setSize(int size) 
 	 {}
-	 
+	public String toString() {
+			String thisclassData = "\nCyborg"+super.toString()+(" maxSpeed = " +this.getMaximumSpeed()+" steeringDirection= "+this.getSteeringDirection()+" energyLevel= "+this.getEnergyLevel()+" damageLevel="+this.getDamageLevel());
+			return thisclassData;
+	 }
 
 }

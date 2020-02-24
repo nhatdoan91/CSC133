@@ -2,37 +2,69 @@ package com.mycompany.a1;
 import java.util.Random;
 import java.util.Vector;
 
+import com.codename1.charts.util.ColorUtil;
+
 public class GameWorld {
 	Random random = new Random();
-	private int gameTime;
-	private int liveOfPlayer;
+	private int gameTime=0;
+	private int liveOfPlayer=3;
 	private boolean endGame=false;
-	private final int lastBase= 4+random.nextInt(6);
+	private int lastBase;
+	private int count=3;
+	private int numberOfDrone;
+	private int numberOfEnergyStation;
 	private Vector<GameObject> gameObjects = new Vector<GameObject>();
+	private boolean exit1=false;
 	
+
 	public int getLastBase() {
 		return this.lastBase;
 	}
 	public void endGame()
 	{
 		if(endGame)
-		{	for (int i=0; i<gameObjects.size(); i++) {
-				if (gameObjects.elementAt(i) instanceof Cyborg) {
-					Cyborg c = (Cyborg)gameObjects.elementAt(i);
-					if(c.isAtLastBase())
-					{
-						System.out.println("You won!!!!!!");
-					}
-					else {
-						System.out.println("GameOver!!!!!!");
-					}
-				}
+		
+			if(this.findCyborg().getLastBaseReached()==this.getLastBase())
+			{
+				System.out.println("\nYou won!!!!!!");
+				System.out.println("Your time is "+this.getGameTime()+" and you have "+this.getLiveOfPlayer()+"lives left :D");
 			}
-		}
+			else {
+				System.out.println("GameOver!!!!!!");
+				try
+				{
+				    Thread.sleep(5000);
+				}
+				catch(InterruptedException ex)
+				{
+				    Thread.currentThread().interrupt();
+				}
+				this.exitTrue();
+				this.exit('y');
+				}
+				
+			
+		
 	}
 	public boolean getEndGame()
 	{
 		return this.endGame;
+	}
+	public void wonGame() {
+		if(this.findCyborg().getLastBaseReached()==this.getLastBase())
+		{
+			System.out.println("\nYou Won The Game!");
+			System.out.println("Your time is "+this.getGameTime()+" and you have "+this.getLiveOfPlayer()+"lives left :D");
+			try
+			{
+			    Thread.sleep(5000);
+			}
+			catch(InterruptedException ex)
+			{
+			    Thread.currentThread().interrupt();
+			}
+			System.exit(0);
+		}
 	}
 	public void setEndGame(boolean result) {
 		this.endGame=result;
@@ -43,26 +75,25 @@ public class GameWorld {
 	}
 	public int getLiveOfPlayer()
 	{
-		return liveOfPlayer;
+		return this.liveOfPlayer;
 	}
 	public int getGameTime() {
 		return this.gameTime;
 	}
 	public void init()
 	{
-		gameTime=0;
-		liveOfPlayer=3;
 		endGame=false;
 		char d='d',b='b',c='c',e='e';
 		createGameObject(c);
-		int numberOfDrone=2+random.nextInt(4);
-		int numberOfEnergyStation=2+random.nextInt(4);
+		numberOfDrone=2+random.nextInt(4);
+		numberOfEnergyStation=2+random.nextInt(4);
+		lastBase=4+random.nextInt(6);
 		for(int i=1; i<= lastBase; i++)
 		{
 			createGameObject(b);
 			
 		}
-		System.out.println("There are "+ this.lastBase+" bases, "+numberOfDrone+" drones, "+numberOfEnergyStation+" energy stations was created!");
+		System.out.println("New Map was just created \n There are "+ this.lastBase+" bases, "+numberOfDrone+" drones, "+numberOfEnergyStation+" energy stations was created!");
 		for (int i=0; i<gameObjects.size(); i++) {
 			if (gameObjects.elementAt(i) instanceof Base) {
 				Base base = (Base)gameObjects.elementAt(i);
@@ -152,42 +183,24 @@ public class GameWorld {
 				if(mov instanceof Cyborg)
 				{
 					Cyborg c = (Cyborg) mov;
-					if(c.isGoingOutOfBoudaries())
+					if(this.findCyborg().isOutOfBattery()||this.findCyborg().isBroken())
 					{
-						c.bound();
-					}
+						this.cyborgReset();
+					}else
+					{
 					c.move();
 					c.energyLostAfterTick();
-					if(c.isOutOfBattery()||c.isBroken())
-					{
-						this.liveOfPlayer--;//Cyborg died
-						if(this.liveOfPlayer==0)
-						{
-							this.endGame();
-						}else
-						{
-							System.out.println("\nYour Cyborg ran out of energy or too damaged. You lost one live!!");
-							c= new Cyborg();
-						}
-						
-					}
-					
 					c.setHeading(c.getHeading()+c.getSteeringDirection());
 					c.checkHeadingBoudaries();
-					System.out.println("\nMy new location is at ("+c.getX()+","+c.getY()+")");
-					System.out.println("\nMy new heading is "+c.getHeading());
+					System.out.println("My new location is at ("+c.getX()+","+c.getY()+")");
+					System.out.println("My new heading is "+c.getHeading());
+					}
 				}
 				if(mov instanceof Drone)
 				{
 					Drone d = (Drone) mov;
-					if(d.isGoingOutOfBoudaries())
-					{
-						d.bound();
-					}
 					d.move();
 					d.changeRandomHeading();
-					System.out.println("\nDrone's new location is at ("+d.getX()+","+d.getY()+")");
-					System.out.println("\nDrone's new heading is "+d.getHeading());
 				}
 			}
 		}
@@ -195,8 +208,12 @@ public class GameWorld {
 	}
 	public void displayCyborg()
 	{
-		System.out.println("\nYou have "+this.liveOfPlayer+" lives left\n"
-				+"\nYour clocktime is "+ this.getGameTime() + " ticks");
+				System.out.println("\nYou have "+this.getLiveOfPlayer()+" lives left\n"
+						+"Your clocktime is at "+ this.getGameTime() + " ticks");
+				System.out.println("\nYour Cybrog: ");
+				System.out.println("++last base reached is "+this.findCyborg().getLastBaseReached());
+				System.out.println("++energy level is "+ this.findCyborg().getEnergyLevel());
+				System.out.println("++damage level is " +this.findCyborg().getDamageLevel());		
 	}
 	
 	public void displayMap()
@@ -204,52 +221,128 @@ public class GameWorld {
 		for (int i=0; i<gameObjects.size(); i++) {
 			if (gameObjects.elementAt(i) instanceof Cyborg)
 			{
-					System.out.print("\nCyborg: ");
+				Cyborg c = (Cyborg) gameObjects.elementAt(i);
+				System.out.println(c.toString());
 			}
 			if (gameObjects.elementAt(i) instanceof Drone)
 			{
-					System.out.print("\nDrone: ");
+				Drone d = (Drone) gameObjects.elementAt(i);
+				System.out.println(d);
 			}
 			if (gameObjects.elementAt(i) instanceof Base )
 			{
-					System.out.print("\nBase: ");
+				Base b = (Base) gameObjects.elementAt(i);
+				System.out.println(b);
 			}
 			if (gameObjects.elementAt(i) instanceof EnergyStation)
 			{
-					System.out.print("\nEnergyStation: ");
+				EnergyStation e = (EnergyStation) gameObjects.elementAt(i);
+				System.out.println(e);
 			}
-			if (gameObjects.elementAt(i) instanceof GameObject)
-			{
-				GameObject g = (GameObject) gameObjects.elementAt(i);
-				g.displayObjects();
-			}
-			if (gameObjects.elementAt(i) instanceof Cyborg)
-			{
-					Cyborg c = (Cyborg) gameObjects.elementAt(i);
-					System.out.print(" heading = "+c.getHeading()+" speed = " +c.getSpeed()+" maxSpeed = " +c.getMaximumSpeed()+" steeringDirection= "+c.getSteeringDirection()+" energyLevel= "+c.getEnergyLevel()+" damageLevel="+c.getDamageLevel());
-			}
-			if (gameObjects.elementAt(i) instanceof Drone)
-			{
-					Drone d = (Drone) gameObjects.elementAt(i);
-					System.out.print(" heading = "+d.getHeading()+" speed = " +d.getSpeed());
-			}
-			if (gameObjects.elementAt(i) instanceof Base)
-			{
-					Base b = (Base) gameObjects.elementAt(i);
-					System.out.print(" SequenceNunmber = "+b.getSequenceNumber());
-			}
-			if (gameObjects.elementAt(i) instanceof EnergyStation)
-			{
-					EnergyStation e = (EnergyStation) gameObjects.elementAt(i);
-					System.out.print(" Capacity = "+e.getenergyCapacity());
-			}
-			
 		}
 	}
+	public void cyborgAcceleration()
+	{
+		int lastSpeed=this.findCyborg().getSpeedWhileDamage();
+		this.findCyborg().speedUp();
+		if(this.findCyborg().getSpeedWhileDamage()!=lastSpeed) {
+			System.out.println("Your Cyborg's speed is "+ this.findCyborg().getSpeedWhileDamage() + " units per tick");
+		}
+	}
+	public void cyborgBreak() {
+		int lastSpeedBreak=this.findCyborg().getSpeedWhileDamage();
+		this.findCyborg().slowDown();
+		if(this.findCyborg().getSpeedWhileDamage()!=lastSpeedBreak)
+		{
+			System.out.println("Your Cyborg's speed is "+ this.findCyborg().getSpeedWhileDamage() + " units per tick");
+		}
+	}
+	public void collideWithCyborg() {
+		System.out.println("\nYou just collided with another cyborg");
+		this.findCyborg().collideWithCyborg();
+		if(!(this.findCyborg().isBroken()))
+		{
+			System.out.println(this.cyborgCollide());
+			
+		}else {
+			this.cyborgReset();
+		}	
+	}
+	public void collideWithDrone() {
+		System.out.println("\nYou just collided with a drone");
+		this.findCyborg().collideWithDrone();
+		if(!this.findCyborg().isBroken())
+		{
 
-	public void exit() {
+			System.out.println(this.cyborgCollide());
+		}else {
+			this.cyborgReset();
+		}
+	}
+	public void collideWithEnergyStation() {
+		int random1= random.nextInt(numberOfEnergyStation);
+		System.out.println("Energy of station number "+(random1+1)+" is "+((EnergyStation) gameObjects.elementAt(random1+lastBase+numberOfDrone+1)).getenergyCapacity()+", and energy of Cyborg is "+this.findCyborg().getEnergyLevel());
+		int color=((EnergyStation) gameObjects.elementAt(random1+lastBase+numberOfDrone+1)).getenergyCapacity();
+		int engeryRemained=this.findCyborg().reachEnergyStation(((EnergyStation) gameObjects.elementAt(random1+lastBase+numberOfDrone+1)).getenergyCapacity());
+		System.out.println(engeryRemained);
+		if(engeryRemained<0)
+		{
+			engeryRemained=0;
+		}
+		((EnergyStation) gameObjects.elementAt(random1+lastBase+numberOfDrone+1)).setEnergyCapacity(engeryRemained); 
+		System.out.println("Energy of Cyborg is recharged to " + this.findCyborg().getEnergyLevel());
+		System.out.println("Energy that remained in the station is: "+((EnergyStation) gameObjects.elementAt(random1+lastBase+numberOfDrone+1)).getenergyCapacity());
+		((EnergyStation) gameObjects.elementAt(random1+lastBase+numberOfDrone+1)).setColor(ColorUtil.rgb(144*(100-100*((EnergyStation) gameObjects.elementAt(random1+lastBase+numberOfDrone+1)).getenergyCapacity())/((color+1)*100),255, 144*(100-100*((EnergyStation) gameObjects.elementAt(random1+lastBase+numberOfDrone+1)).getenergyCapacity())/((color+1)*100)));//light green
+		System.out.println("Color of this station is: " + "[" + ColorUtil.red(((EnergyStation) gameObjects.elementAt(random1+lastBase+numberOfDrone+1)).getColor()) + "," +
+														ColorUtil.green(((EnergyStation) gameObjects.elementAt(random1+lastBase+numberOfDrone+1)).getColor()) + "," + 							
+														+ ColorUtil.blue(((EnergyStation) gameObjects.elementAt(random1+lastBase+numberOfDrone+1)).getColor()) + "]");
+		this.createGameObject('e');
+		System.out.println("\nA new energy station was just created!!!!");
+		numberOfEnergyStation++;
+	}
+	public String cyborgCollide()
+	{
+		return "Cyborg's damage level is "+ this.findCyborg().getDamageLevel()+"\nCyborg's color is: " + "[" + ColorUtil.red(this.findCyborg().getColor()) + "," + 
+				+ ColorUtil.green(this.findCyborg().getColor()) + "," + 
+				+ ColorUtil.blue(this.findCyborg().getColor()) + "]";
+	}
+	public void cyborgReset()
+	{
+		System.out.println("Your Cyborg is destroyed. You lost one live!");
+		this.count--;
+		this.setLiveOfPlayer(count);
+		System.out.println("Your number of lives is: "+this.getLiveOfPlayer());
+		if(this.getLiveOfPlayer()==0)
+		{
+			this.setEndGame(true);
+			this.endGame();
+		}
+		gameObjects.clear();
+		this.init();
+	}
 	
-		System.exit(0);
+	public void exitTrue()
+	{
+		this.exit1=true;
+	}
+	public void exitFasle()
+	{
+		this.exit1=false;
+	}
+
+	public void exit(char x) {
+
+		if( this.exit1==true) {
+		if(x=='y')
+		{
+			System.exit(0);
+		}else if (x== 'n')
+		{
+			
+				System.out.println("\nThe Game continues");
+				this.exit1=false;
+		}
+		}
 	}
 	
 }

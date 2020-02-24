@@ -9,11 +9,17 @@ abstract public class Movable extends GameObject{
 	public void move() {
 		this.setMovX();
 		this.setMovY();
-		super.setLocation(this.getMovX()+super.getX(),this.getMovY()+super.getY());
+		if((super.getLocation().getX()+movX)>1000||super.getLocation().getX()+movX<0||super.getLocation().getY()+movY>1000||super.getLocation().getY()+movY<0)
+		{
+			this.bound();
+		}else
+		{
+			super.setLocation(this.getMovX()+super.getX(),this.getMovY()+super.getY());
+		}
 	}
 	private void setMovX()
 	{
-		this.movX=Math.round((Math.cos(-(this.heading-90))*this.speed));
+		this.movX=Math.round((Math.cos(Math.toRadians(-(this.heading-90)))*this.speed));
 	}
 	private float getMovX()
 	{
@@ -21,7 +27,7 @@ abstract public class Movable extends GameObject{
 	}
 	private void setMovY()
 	{
-		this.movY=Math.round((Math.sin(-(this.heading-90))*this.speed));
+		this.movY=Math.round((Math.sin(Math.toRadians(-(this.heading-90)))*this.speed));
 	}
 	private float getMovY()
 	{
@@ -39,16 +45,6 @@ abstract public class Movable extends GameObject{
 	public int getSpeed() {
 		return this.speed;
 	}
-	public boolean isGoingOutOfBoudaries() {
-		if((super.getLocation().getX()+movX)>1000||super.getLocation().getX()+movX<0||super.getLocation().getY()+movY>1000||super.getLocation().getY()+movY<0)
-		{
-			return true;
-		}else
-		{
-			return false;
-		}
-	}
-
 	public void bound() {
 		this.heading=this.heading+180;
 		this.checkHeadingBoudaries();
@@ -67,5 +63,12 @@ abstract public class Movable extends GameObject{
 	public int getLastBase() {
 		int i=super.getLastBase();
 		return i;
+	}
+	@Override
+	public String toString()
+	{
+		String thisCLassData=" heading = "+this.getHeading()+" speed = " +this.getSpeed();
+		thisCLassData =super.toString()+ thisCLassData;
+		return thisCLassData;
 	}
 }
