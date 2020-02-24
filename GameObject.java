@@ -68,4 +68,11 @@ abstract public class GameObject extends GameWorld{
 					+ ColorUtil.green(this.getColor()) + "," +  
 					 ColorUtil.blue(this.getColor()) + "] size = " +this.getSize());
 	}
+	@Override
+	public String toString() {
+		String thisClassData=" loc = "+this.getX()+", " + this.getY()+ " color = " + "[" + ColorUtil.red(this.getColor()) + "," 
+				+ ColorUtil.green(this.getColor()) + "," +  
+				 ColorUtil.blue(this.getColor()) + "] size = " +this.getSize();
+		return (thisClassData);
+	}
 }

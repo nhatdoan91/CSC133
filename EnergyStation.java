@@ -9,9 +9,9 @@ public class EnergyStation extends Fixed {
 	public EnergyStation()
 	{		
 		super.setSize(10+random.nextInt(30));
-		super.setColor(ColorUtil.GREEN);
+		super.setColor(ColorUtil.rgb(144, 255, 144));
 		super.setRandomLocation();
-		this.energyCapacity=(super.getSize()*5);// energyCapacity is proportional with size (ratio 1:2)
+		this.energyCapacity=(super.getSize()*3);// energyCapacity is proportional with size (ratio 1:2)
 	}
 	public void setEnergyCapacity(int energy)
 	{
@@ -22,6 +22,11 @@ public class EnergyStation extends Fixed {
 	}
 	@Override
 	public void setSize(int size) {}
-	public void setLocation(double x, double y)
+	public void setLocation(float x, float y)
 	{}
+	public String toString() 
+	{
+		String thisClassData = "EnergyStation "+super.toString()+(" Capacity = "+this.getenergyCapacity());
+		return thisClassData;
+	}
 }

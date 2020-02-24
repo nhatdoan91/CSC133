@@ -31,4 +31,8 @@ public class Drone extends Movable{
 	@Override
 	public void setSize(int size) {}
 	public void setColor(int color) {}
+	public String toString() {
+		String thisClassData ="Drone: " +super.toString();
+		return thisClassData;
+	}
 }
